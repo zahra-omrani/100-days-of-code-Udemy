@@ -10,9 +10,9 @@ def guess_number():
        print("You guessed it right!")
        return True
    elif user_picked > chosen_number:
-         print("Too high!"+ "\n" + "Guess again.")
+         print("Too high!")
    elif user_picked < chosen_number:
-         print("Too low!"+ "\n" + "Guess again.")
+         print("Too low!")
          return False
 
 if game_mode == 'easy':
@@ -20,11 +20,13 @@ if game_mode == 'easy':
 else:
     atempts = 5
     for i in range(1, atempts+1):
-        print(f"You have {atempts-1} attempts to guess the number.")
+        print(f"You have {atempts} attempts to guess the number.")
         user_picked = int(input("Make a guess: "))
+        atempts -= 1
         if guess_number():
              break 
-        else: print("You've run out of guesses. You lose!")
+        
+print("You've run out of guesses. You lose!")
     
 
 
