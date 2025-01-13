@@ -14,7 +14,7 @@ def guess_number():
    elif user_picked < chosen_number:
          print("Too low!")
          return False
-
+   
 if game_mode == 'easy':
     atempts = 10
 else:
