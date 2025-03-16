@@ -2,7 +2,7 @@
 
 
 import sys
-
+import re
 
 MENU = {
     "espresso": {
@@ -54,10 +54,10 @@ def print_report(user_input):
 
 
 # TODO: Prompt user by asking “ What would you like? (espresso/latte/cappuccino):​ ” 
-order = input("What would you like? (espresso/latte/cappiccino): ")
+#order = input("What would you like? (espresso/latte/cappiccino): ")
 
-print_report(order)
-turn_off(order)
+#print_report(order)
+#turn_off(order)
 # TODO: Check resources sufficient? 
 def resource_sufficient():
     if resources['water'] < 50 :
@@ -67,10 +67,27 @@ def resource_sufficient():
     if resources ["coffee"] < 18:
         print("Sorry there is not enough coffee")
 # TODO: Process coins. 
-def process_coin():
-  
+import re
+
+def process_coin(coins):
+    def extract_coin_value(pattern, text):
+        match = re.findall(pattern, text)
+        return int(match[0]) if match else 0  # Convert to int or return 0 if not found
+
+    quarter_coin = extract_coin_value(r"(\d+) quarter", coins)
+    dimes_coin = extract_coin_value(r"(\d+) dime", coins)
+    nickels_coin = extract_coin_value(r"(\d+) nickel", coins)
+    pennies_coin = extract_coin_value(r"(\d+) penny", coins)
+
+    total = 0.25 * quarter_coin + 0.1 * dimes_coin + 0.05 * nickels_coin + 0.01 * pennies_coin
+    return total
+
+# Example Usage:
+print(process_coin("I have 3 quarters, 555555 dimes, 1 nickel, and 4 pennies."))  # Expected output: 1.04
+
 # TODO: Check transaction successful? 
 
 # TODO: Make Coffee. 
 
 # TODO - todo note
+
