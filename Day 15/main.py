@@ -34,6 +34,7 @@ resources = {
     "water": 300,
     "milk": 200,
     "coffee": 100,
+    "money": 0
 }
 
 # TODO: Turn off the Coffee Machine by entering “ off​ ” to the prompt. 
@@ -49,15 +50,8 @@ def print_report(user_input):
             f"Water: {resources['water']}\n"
             f"Milk: {resources['milk']}\n"
             f"Coffee: {resources['coffee']}\n"
-            "Money: 000"
+            f"Money: {resources['money']}\n"
         )
-
-
-# TODO: Prompt user by asking “ What would you like? (espresso/latte/cappuccino):​ ” 
-#order = input("What would you like? (espresso/latte/cappiccino): ")
-
-#print_report(order)
-#turn_off(order)
 # TODO: Check resources sufficient? 
 def resource_sufficient():
     if resources['water'] < 50 :
@@ -86,8 +80,30 @@ def process_coin(coins):
 print(process_coin("I have 3 quarters, 555555 dimes, 1 nickel, and 4 pennies."))  # Expected output: 1.04
 
 # TODO: Check transaction successful? 
+# Check if transaction was successful
+def tran_succ(order, money_inserted):
+    cost = MENU[order]['cost']
 
+    if money_inserted < cost:
+        print("Sorry, that's not enough money. Money refunded.")
+        return False
+    else:
+        resources['money'] += cost
+        change = money_inserted - cost
+        if change > 0:
+            print(f"Here is ${change:.2f} in change.")
+        return True
 # TODO: Make Coffee. 
 
 # TODO - todo note
+
+# TODO: Prompt user by asking “ What would you like? (espresso/latte/cappuccino):​ ” 
+order = input("What would you like? (espresso/latte/cappiccino): ")
+coins = input("Insert your coins:")
+
+money_inserted = process_coin(coins)
+
+if tran_succ(order, money_inserted):  # Check if transaction was successful
+   print("1")
+
 
