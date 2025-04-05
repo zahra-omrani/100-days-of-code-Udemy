@@ -1,9 +1,7 @@
-
-
-
 import sys
 import re
 
+# --- MENU CONFIGURATION ---
 MENU = {
     "espresso": {
         "ingredients": {
@@ -30,57 +28,48 @@ MENU = {
     }
 }
 
+# --- INITIAL RESOURCE STATE ---
 resources = {
     "water": 300,
     "milk": 200,
     "coffee": 100,
-    "money": 0
+    "money": 0.0
 }
 
-# TODO: Turn off the Coffee Machine by entering “ off​ ” to the prompt. 
-def turn_off(user_input):
-    if user_input == 'off':
-        sys.exit("User asked to turn off the coffe mechine!")
-    
+# --- PRINT REPORT ---
+def print_report():
+    print(
+        f"Water: {resources['water']}ml\n"
+        f"Milk: {resources['milk']}ml\n"
+        f"Coffee: {resources['coffee']}g\n"
+        f"Money: ${resources['money']:.2f}\n"
+    )
 
-# TODO: Print report. 
-def print_report(user_input):
-    if user_input == 'report':
-        print(
-            f"Water: {resources['water']}\n"
-            f"Milk: {resources['milk']}\n"
-            f"Coffee: {resources['coffee']}\n"
-            f"Money: {resources['money']}\n"
-        )
-# TODO: Check resources sufficient? 
-def resource_sufficient():
-    if resources['water'] < 50 :
-        return("Sorry there is not enough water!")
-    if resources ["milk"] < 100: 
-        return("Sorry there is not enough milk")
-    if resources ["coffee"] < 18:
-        return("Sorry there is not enough coffee")
-# TODO: Process coins. 
-import re
+# --- CHECK IF RESOURCES ARE SUFFICIENT FOR THE ORDER ---
+def resource_sufficient(order):
+    ingredients = MENU[order]["ingredients"]
+    for item in ingredients:
+        if resources.get(item, 0) < ingredients[item]:
+            print(f"Sorry, there is not enough {item}.")
+            return False
+    return True
 
-def process_coin(coins):
+# --- PROCESS COIN INPUT ---
+def process_coin(coins_input):
+    """This function returns the total amount that the user entered"""
     def extract_coin_value(pattern, text):
         match = re.findall(pattern, text)
-        return int(match[0]) if match else 0  # Convert to int or return 0 if not found
+        return int(match[0]) if match else 0
 
-    quarter_coin = extract_coin_value(r"(\d+) quarter", coins)
-    dimes_coin = extract_coin_value(r"(\d+) dime", coins)
-    nickels_coin = extract_coin_value(r"(\d+) nickel", coins)
-    pennies_coin = extract_coin_value(r"(\d+) penny", coins)
+    quarter = extract_coin_value(r"(\d+)\s*quarter", coins_input)
+    dime = extract_coin_value(r"(\d+)\s*dime", coins_input)
+    nickel = extract_coin_value(r"(\d+)\s*nickel", coins_input)
+    penny = extract_coin_value(r"(\d+)\s*penny", coins_input)
 
-    total = 0.25 * quarter_coin + 0.1 * dimes_coin + 0.05 * nickels_coin + 0.01 * pennies_coin
-    return total
+    total = 0.25 * quarter + 0.10 * dime + 0.05 * nickel + 0.01 * penny
+    return round(total, 2)
 
-# Example Usage:
-print(process_coin("I have 3 quarters, 555555 dimes, 1 nickel, and 4 pennies."))  # Expected output: 1.04
-
-# TODO: Check transaction succesreturn (sful? 
-# Check if transaction was successful
+# --- CHECK TRANSACTION SUCCESS ---
 def tran_succ(order, money_inserted):
     cost = MENU[order]['cost']
 
@@ -88,39 +77,41 @@ def tran_succ(order, money_inserted):
         print("Sorry, that's not enough money. Money refunded.")
         return False
     else:
-        resources['money'] += cost
-        change = money_inserted - cost
+        change = round(money_inserted - cost, 2)
         if change > 0:
             print(f"Here is ${change:.2f} in change.")
+        resources['money'] += cost
         return True
-# TODO: Make Coffee. 
-def make_coffe(order):
-    resources["coffee"] = resources["coffee"]- MENU[order]["ingredients"]["coffee"]
-    resources ["milk"]  = resources["milk"] - MENU[order]["ingredients"]["milk"]
-    resources["water"] = resources ["water"] - MENU [order]["ingredients"]["water"]
-    resources["money"] = resources["money"] + MENU [order]["cost"]
-    print("here is your"+order)
 
-# TODO - todo note
+# --- MAKE COFFEE AND DEDUCT INGREDIENTS ---
+def make_coffee(order):
+    ingredients = MENU[order]["ingredients"]
+    for item in ingredients:
+        resources[item] -= ingredients[item]
+    print(f"Here is your {order}. Enjoy! ☕️")
 
-# TODO: Prompt user by asking “ What would you like? (espresso/latte/cappuccino):​ ” 
-# order = input("What would you like? (espresso/latte/cappiccino): ")
-# coins = input("Insert your coins:")
+# --- MAIN PROGRAM LOOP ---
+def coffee_machine():
+    is_on = True
+    while is_on:
+        order = input("What would you like? (espresso/latte/cappuccino): ").lower()
 
-# money_inserted = process_coin(coins)
+        if order == "off":
+            print("Turning off... Bye! 👋")
+            is_on = False
 
+        elif order == "report":
+            print_report()
 
-is_on = True
-while is_on:
-   order = input("What would you like? (espresso/latte/cappiccino): ")
-   if order == "off":
-       is_on = False
-   else:
-    coins = input("Insert your coins:") 
-    money_inserted = process_coin(coins)
-    if tran_succ(order, money_inserted):  # Check if transaction was successful
-        resource_sufficient()
-        make_coffe(order)
+        elif order in MENU:
+            if resource_sufficient(order):
+                coins_input = input("Insert your coins (e.g., '1 quarter, 2 dimes, 1 nickel, 4 pennies'): ")
+                money_inserted = process_coin(coins_input)
+                if tran_succ(order, money_inserted):
+                    make_coffee(order)
 
+        else:
+            print("Invalid input. Please choose espresso, latte, or cappuccino.")
 
-print( MENU["latte"]["ingredients"]["coffee"])
+# --- RUN THE COFFEE MACHINE ---
+coffee_machine()
